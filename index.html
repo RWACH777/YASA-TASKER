@@ -1,97 +1,168 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Yasa Tasker</title>
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yasa Tasker - Pi Freelancer App</title>
 <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<style>
+  body {
+    background-color: #1a237e; /* dark blue background */
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  .container { max-width: 800px; margin: auto; }
+  h1, h2 { color: #fff; }
+  .card {
+    background-color: #283593;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  button {
+    padding: 12px 24px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  #loginButton {
+    background-color: #4caf50;
+    color: #fff;
+    margin-top: 10px;
+  }
+  #loginButton:hover { background-color: #388e3c; }
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 12px 0;
+    box-sizing: border-box;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+  label { font-weight: bold; }
+  .hint { font-size: 12px; color: #c5cae9; }
+  #job-list li {
+    background-color: #3949ab;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    list-style: none;
+  }
+</style>
 </head>
 <body>
-  <header class="container">
-    <h1>Yasa Tasker</h1>
-    <p>This is a very simple starter you can deploy to Vercel. Replace this with your real app later.</p>
-  </header>
+<div class="container">
 
-  <main class="container grid">
-    <section class="card">
-      <h2>Post a Job</h2>
-      <form id="job-form">
-        <label>
-          Job Title
-          <input id="job-title" type="text" placeholder="e.g., Build landing page" required />
-        </label>
-        <label>
-          Budget (Pi)
-          <input id="job-budget" type="number" min="0" step="0.01" placeholder="e.g., 12.5" required />
-        </label>
-        <label>
-          Description
-          <textarea id="job-desc" rows="4" placeholder="Short description..." required></textarea>
-        </label>
-        <button type="submit">Add Job</button>
-      </form>
-    </section>
+<header class="card">
+  <h1>Yasa Tasker</h1>
+  <p>Pi-powered freelancer app. Post tasks, pay securely, and earn Pi!</p>
+</header>
 
-    <section class="card">
-      <h2>Open Jobs (local demo)</h2>
-      <ul id="job-list"></ul>
-      <p class="hint">These are stored locally in your browser for demo purposes only.</p>
-    </section>
-  </main>
+<main>
+  <section class="card">
+    <h2>Post a Task</h2>
+    <form id="job-form">
+      <label>Task Title
+        <input id="job-title" type="text" placeholder="e.g., Build landing page" required>
+      </label>
+      <label>Budget (Pi)
+        <input id="job-budget" type="number" min="0" step="0.01" placeholder="e.g., 12.5" required>
+      </label>
+      <label>Description
+        <textarea id="job-desc" rows="4" placeholder="Short description..." required></textarea>
+      </label>
+      <button type="submit">Post Task</button>
+    </form>
+  </section>
 
-  <footer class="container">
-    <p class="hint">
-      Next steps: put these files in a folder, upload to GitHub, deploy on Vercel, paste the Vercel URL into Pi Developer Portal (Development URL).
-    </p>
-  </footer>
+  <section class="card">
+    <h2>Open Tasks</h2>
+    <ul id="job-list"></ul>
+    <p class="hint">These are stored locally for demo purposes.</p>
+  </section>
+</main>
 
-  <script src="script.js"></script>
+<footer class="card">
+  <p class="hint">Next: Deploy on Vercel, connect with Pi Developer Portal, and manage real payments.</p>
+</footer>
+
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+  // Initialize Pi SDK
   Pi.init({ version: "2.0" });
-
-  const loginButton = document.getElementById("login");
-  const usernameDisplay = document.getElementById("username");
-
-  loginButton.addEventListener("click", async () => {
-    try {
-      const scopes = ['username', 'payments'];
-      const user = await Pi.authenticate(scopes, onIncompletePaymentFound);
-      usernameDisplay.innerText = "Welcome, " + user.username;
-    } catch (err) {
-      console.error(err);
-    }
-  });
 
   function onIncompletePaymentFound(payment) {
     console.log("Incomplete payment found:", payment);
   }
-</script>
-<script>
-  // Initialize the Pi SDK
-  Pi.init({ version: "2.0" });
 
-  window.onload = function () {
-    const loginBtn = document.createElement("button");
-    loginBtn.innerText = "Login with Pi";
-    loginBtn.onclick = () => {
-      Pi.authenticate(["username", "payments"], onIncompletePaymentFound)
-        .then(function(authResult) {
-          console.log("Authentication successful:", authResult);
-          alert("Welcome " + authResult.user.username);
-        })
-        .catch(function(error) {
-          console.error("Authentication failed:", error);
-        });
-    };
-
-    document.body.appendChild(loginBtn);
+  // Pi login button
+  const loginBtn = document.createElement("button");
+  loginBtn.id = "loginButton";
+  loginBtn.innerText = "Login with Pi";
+  loginBtn.onclick = () => {
+    Pi.authenticate(["username", "payments"], onIncompletePaymentFound)
+      .then(authResult => {
+        console.log("Authentication successful:", authResult);
+        alert("Welcome " + authResult.user.username);
+      })
+      .catch(error => console.error("Authentication failed:", error));
   };
+  document.querySelector("header").appendChild(loginBtn);
 
-  // Example handler
-  function onIncompletePaymentFound(payment) {
-    console.log("Incomplete payment found:", payment);
-  }
+  // Step 2: Job form submit triggers Pi payment (mobile-compatible)
+  const jobForm = document.getElementById("job-form");
+  const jobList = document.getElementById("job-list");
+  const platformFeePercent = 5; // 5% fee
+
+  jobForm.addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const title = document.getElementById("job-title").value.trim();
+    const budget = parseFloat(document.getElementById("job-budget").value);
+    const desc = document.getElementById("job-desc").value.trim();
+
+    if (!title || isNaN(budget) || budget <= 0 || !desc) {
+      alert("Please fill out all fields with valid data.");
+      return;
+    }
+
+    const fee = (budget * platformFeePercent) / 100;
+    const payeeAmount = budget - fee;
+
+    // Add job to Open Tasks list
+    const li = document.createElement("li");
+    li.textContent = `${title} — ${budget} Pi (Fee: ${fee.toFixed(2)} Pi, Paid to worker: ${payeeAmount.toFixed(2)} Pi): ${desc}`;
+    jobList.appendChild(li);
+
+    // Trigger Pi payment using isReadySync() for direct user gesture
+    if (Pi.isReadySync && Pi.isReadySync()) {
+      Pi.createPayment({
+        amount: budget,
+        memo: `Payment for task: ${title} (Fee: ${fee.toFixed(2)} Pi)`,
+        metadata: { taskTitle: title, fee: fee.toFixed(2) }
+      }, {
+        onReadyForServerApproval: (paymentId) => console.log("Payment ready:", paymentId),
+        onReadyForServerCompletion: (paymentId, txid) =>
+          alert(`Payment successful! Total: ${budget} Pi, Fee: ${fee.toFixed(2)} Pi`),
+        onCancel: () => alert("Payment cancelled."),
+        onError: (err) => alert("Payment error: " + err.message)
+      });
+    } else {
+      alert("Pi SDK is not ready yet. Try again in a moment.");
+    }
+
+    jobForm.reset();
+  });
+});
 </script>
+
+</div>
 </body>
 </html>
