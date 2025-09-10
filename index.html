@@ -3,12 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Yasa Freelancer — Starter</title>
+  <title>Yasa Tasker</title>
   <link rel="stylesheet" href="styles.css" />
+<script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
   <header class="container">
-    <h1>Yasa Freelancer (Starter)</h1>
+    <h1>Yasa Tasker</h1>
     <p>This is a very simple starter you can deploy to Vercel. Replace this with your real app later.</p>
   </header>
 
@@ -46,5 +47,51 @@
   </footer>
 
   <script src="script.js"></script>
+<script>
+  Pi.init({ version: "2.0" });
+
+  const loginButton = document.getElementById("login");
+  const usernameDisplay = document.getElementById("username");
+
+  loginButton.addEventListener("click", async () => {
+    try {
+      const scopes = ['username', 'payments'];
+      const user = await Pi.authenticate(scopes, onIncompletePaymentFound);
+      usernameDisplay.innerText = "Welcome, " + user.username;
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  function onIncompletePaymentFound(payment) {
+    console.log("Incomplete payment found:", payment);
+  }
+</script>
+<script>
+  // Initialize the Pi SDK
+  Pi.init({ version: "2.0" });
+
+  window.onload = function () {
+    const loginBtn = document.createElement("button");
+    loginBtn.innerText = "Login with Pi";
+    loginBtn.onclick = () => {
+      Pi.authenticate(["username", "payments"], onIncompletePaymentFound)
+        .then(function(authResult) {
+          console.log("Authentication successful:", authResult);
+          alert("Welcome " + authResult.user.username);
+        })
+        .catch(function(error) {
+          console.error("Authentication failed:", error);
+        });
+    };
+
+    document.body.appendChild(loginBtn);
+  };
+
+  // Example handler
+  function onIncompletePaymentFound(payment) {
+    console.log("Incomplete payment found:", payment);
+  }
+</script>
 </body>
 </html>
