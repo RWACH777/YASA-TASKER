@@ -3,24 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pi Login Test</title>
+  <title>Yasa Tasker</title>
+  <!-- Load Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
-  <h1>Test: Pi Login</h1>
-  <button id="loginButton">Login with Pi</button>
+  <h1>Welcome to Yasa Tasker</h1>
+  <p>Test Pi login and payment integration.</p>
+
+  <!-- Buttons will be added dynamically -->
 
   <script>
-  console.log("✅ Script loaded");
+    // Initialize Pi SDK
+    Pi.init({ version: "2.0" });
 
-  document.addEventListener("DOMContentLoaded", function () {
-    if (typeof Pi !== "undefined") {
-      alert("🎉 Pi SDK loaded successfully!");
-    } else {
-      alert("⚠️ Pi SDK not found!");
+    window.onload = function () {
+      // Login button
+      const loginBtn = document.createElement("button");
+      loginBtn.innerText = "Login with Pi";
+      loginBtn.onclick = async () => {
+        try {
+          const authResult = await Pi.authenticate(
+            ["username", "payments"],
+            onIncompletePaymentFound
+          );
+          alert("Welcome " + authResult.user.username);
+        } catch (error) {
+          alert("Login failed: " + error);
+          console.error(error);
+        }
+      };
+      document.body.appendChild(loginBtn);
+
+      // Pay button
+      const payBtn = document.createElement("button");
+      payBtn.innerText = "Pay 1 Pi";
+      payBtn.onclick = async () => {
+        try {
+          const payment = await Pi.createPayment({
+            amount: 1,
+            memo: "Test payment from Yasa Tasker",
+            metadata: { jobId: "1234" }
+          }, {
+            onReadyForServerApproval: (paymentId) => {
+              console.log("Ready for server approval:", paymentId);
+            },
+            onReadyForServerCompletion: (paymentId, txid) => {
+              console.log("Ready for server completion:", paymentId, txid);
+            },
+            onCancel: () => {
+              alert("Payment cancelled!");
+            },
+            onError: (err) => {
+              console.error(err);
+              alert("Payment error: " + err);
+            }
+          });
+
+          console.log("Payment created:", payment);
+        } catch (err) {
+          console.error(err);
+        }
+      };
+      document.body.appendChild(payBtn);
+    };
+
+    // Handle incomplete payments
+    function onIncompletePaymentFound(payment) {
+      console.log("Incomplete payment found:", payment);
     }
-  });
-
-</script>
+  </script>
 </body>
 </html>
