@@ -1,76 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yasa Tasker</title>
-  <!-- Load Pi SDK -->
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Yasa Tasker</title>
+ <link rel="stylesheet" href="style.css">
+
+ <!-- Load Pi SDK -->
+ <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 </head>
 <body>
-  <h1>Welcome to Yasa Tasker</h1>
-  <p>Test Pi login and payment integration.</p>
+ <h1>Welcome to Yasa Tasker</h1>
+ <p>Test Pi login and payment integration.</p>
 
-  <!-- Buttons will be added dynamically -->
+ <!-- Buttons will be added dynamically -->
+ <button id="loginbutton">Log in with pi</button>
+ <button id="paybutton">pay with pi</button>
 
-  <script>
-    // Initialize Pi SDK
-    Pi.init({ version: "2.0" });
+ <script>
+  // Initialize Pi SDK
+  Pi.init({ version: "2.0" });
 
-    window.onload = function () {
-      // Login button
-      const loginBtn = document.createElement("button");
-      loginBtn.innerText = "Login with Pi";
-      loginBtn.onclick = async () => {
-        try {
-          const authResult = await Pi.authenticate(
-            ["username", "payments"],
-            onIncompletePaymentFound
-          );
-          alert("Welcome " + authResult.user.username);
-        } catch (error) {
-          alert("Login failed: " + error);
-          console.error(error);
-        }
-      };
-      document.body.appendChild(loginBtn);
+  // LOGIN button
+    document.getElementById("loginButton").addEventListener("click", async () => {
+   try {
+     const scopes = ["username", "payments"];
+     const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+     alert("Welcome " + auth.user.username);
+    } catch (err) {
+      console.error(err);
+     }
+   });
 
-      // Pay button
-      const payBtn = document.createElement("button");
-      payBtn.innerText = "Pay 1 Pi";
-      payBtn.onclick = async () => {
-        try {
-          const payment = await Pi.createPayment({
-            amount: 1,
-            memo: "Test payment from Yasa Tasker",
-            metadata: { jobId: "1234" }
-          }, {
-            onReadyForServerApproval: (paymentId) => {
-              console.log("Ready for server approval:", paymentId);
-            },
-            onReadyForServerCompletion: (paymentId, txid) => {
-              console.log("Ready for server completion:", paymentId, txid);
-            },
-            onCancel: () => {
-              alert("Payment cancelled!");
-            },
-            onError: (err) => {
-              console.error(err);
-              alert("Payment error: " + err);
-            }
-          });
+   // PAYMENT button
 
-          console.log("Payment created:", payment);
-        } catch (err) {
-          console.error(err);
-        }
-      };
-      document.body.appendChild(payBtn);
-    };
+document.getElementById("payButton").addEventListener("click", async () => {
+      try {
+       const payment = await Pi.createPayment({
+        amount: 1,
+        memo: "Test payment from Yasa Tasker",
+        metadata: { jobId: "1234" },
+        }, {
+          onReadyForServerApproval: (paymentId) => { console.log("Ready", paymentId); },
+          onReadyForServerCompletion: (paymentId) => { console.log("Complete", paymentId); },
+          onCancel: (paymentId) => { console.log("Cancelled", paymentId); },
+          onError: (error, payment) => { console.error(error); }
+        });
 
-    // Handle incomplete payments
+        console.log("Payment object:", payment);
+      } catch (err) {
+        console.error("Payment failed:", err);
+      }
+    });
+
+    // Incomplete payment handler
     function onIncompletePaymentFound(payment) {
-      console.log("Incomplete payment found:", payment);
+      console.log("Incomplete payment:", payment);
     }
   </script>
 </body>
