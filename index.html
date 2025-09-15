@@ -87,39 +87,47 @@
   <script>
     console.log("JS loaded");
 
-    // 1. Initialize Pi SDK
-    Pi.init();
-
-    // LOGIN BUTTON
-    const loginButton = document.getElementById("loginButton");
-    loginButton.addEventListener("click", async () => {
-      try {
-        const scopes = ['username', 'payments']; 
-        const auth = await Pi.authenticate(scopes, null); // null = no incomplete payment callback
-        alert("Welcome " + auth.user.username + " to Yasa Tasker!");
-        console.log("Auth result:", auth);
-      } catch (err) {
-        console.error("Login failed:", err);
-        alert("Login failed: " + err);
+    // Wait until the page and Pi SDK are fully loaded
+    window.addEventListener("load", () => {
+      if (!Pi) {
+        alert("Pi SDK not loaded! Check your internet connection.");
+        return;
       }
-    });
 
-    // PAY BUTTON
-    const payButton = document.getElementById("payButton");
-    payButton.addEventListener("click", async () => {
-      try {
-        const paymentData = {
-          amount: 1,
-          memo: "Payment for Yasa Tasker task",
-          metadata: { jobId: "1234" }
-        };
-        const result = await Pi.createPayment(paymentData);
-        alert("Payment successful!");
-        console.log("Payment result:", result);
-      } catch (err) {
-        console.error("Payment failed:", err);
-        alert("Payment failed: " + err);
-      }
+      // Initialize Pi SDK
+      Pi.init();
+
+      // LOGIN BUTTON
+      const loginButton = document.getElementById("loginButton");
+      loginButton.addEventListener("click", async () => {
+        try {
+          const scopes = ['username', 'payments']; 
+          const auth = await Pi.authenticate(scopes, null);
+          alert("Welcome " + auth.user.username + " to Yasa Tasker!");
+          console.log("Auth result:", auth);
+        } catch (err) {
+          console.error("Login failed:", err);
+          alert("Login failed: " + err);
+        }
+      });
+
+      // PAY BUTTON
+      const payButton = document.getElementById("payButton");
+      payButton.addEventListener("click", async () => {
+        try {
+          const paymentData = {
+            amount: 1,
+            memo: "Payment for Yasa Tasker task",
+            metadata: { jobId: "1234" }
+          };
+          const result = await Pi.createPayment(paymentData);
+          alert("Payment successful!");
+          console.log("Payment result:", result);
+        } catch (err) {
+          console.error("Payment failed:", err);
+          alert("Payment failed: " + err);
+        }
+      });
     });
   </script>
 </body>
