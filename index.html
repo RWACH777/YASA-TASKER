@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yasa Tasker</title>
 
-  <!-- Pi SDK with onload to initialize -->
+  <!-- Pi SDK with onload -->
   <script src="https://sdk.minepi.com/pi-sdk.js" onload="initPi()"></script>
 
   <style>
@@ -113,10 +113,14 @@
   <script>
     let loggedInUser = null;
 
-    // Called automatically when Pi SDK loads
     function initPi() {
-      console.log("Pi SDK loaded and initializing...");
-      Pi.init();
+      console.log("Pi SDK loaded, initializing...");
+
+      // Proper initialization for live network
+      Pi.init({
+        version: "2.0",
+        sandbox: false
+      });
 
       const loginButton = document.getElementById("loginButton");
       const payButton = document.getElementById("payButton");
