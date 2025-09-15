@@ -1,59 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Yasa Tasker</title>
- <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yasa Tasker</title>
+  <!-- Pi SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
 
- <!-- Load Pi SDK -->
- <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <!-- Basic Styling -->
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #333;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #fff;
+      text-shadow: 1px 1px 2px #0003;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      margin: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    #loginButton {
+      background-color: #ffd700;
+      color: #000;
+    }
+
+    #loginButton:hover {
+      transform: scale(1.05);
+      background-color: #ffc300;
+    }
+
+    #payButton {
+      background-color: #4caf50;
+      color: #fff;
+    }
+
+    #payButton:hover {
+      transform: scale(1.05);
+      background-color: #45a049;
+    }
+
+    .container {
+      text-align: center;
+      background: rgba(255,255,255,0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
 <body>
- <h1>Welcome to Yasa Tasker</h1>
+  <div class="container">
+    <h1>Welcome to Yasa Tasker</h1>
+    <p>Log in with Pi to get started!</p>
 
-  <!-- Login Button -->
-  <button id="loginButton">Login with Pi</button>
+    <!-- Buttons -->
+    <button id="loginButton">Log in with Pi</button>
+    <button id="payButton">Pay 1 Pi</button>
+  </div>
 
-  <!-- Payment Button -->
-  <button id="payButton">Pay 1 Pi</button>
+  <!-- Script Handlers -->
+  <script>
+    console.log("JS loaded, Pi SDK should be available:", Pi);
 
- <script>
-  // Initialize Pi SDK
-  Pi.init({ version: "2.0" });
+    // Make sure Pi object exists
+    if (!Pi) {
+      alert("Pi SDK not loaded! Check your internet connection and the SDK URL.");
+    }
 
-  // LOGIN button
-    document.getElementById("loginButton").addEventListener("click", async () => {
-   try {
-     const scopes = ["username", "payments"];
-     const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-     alert("Welcome " + auth.user.username);
-    } catch (err) {
-      console.error(err);
-     }
-   });
-
-   // PAYMENT button
-
-document.getElementById("payButton").addEventListener("click", async () => {
+    // LOGIN BUTTON
+    const loginButton = document.getElementById("loginButton");
+    loginButton.addEventListener("click", async () => {
       try {
-       const payment = await Pi.createPayment({
-        amount: 1,
-        memo: "Test payment from Yasa Tasker",
-        metadata: { jobId: "1234" },
-        }, {
-          onReadyForServerApproval: (paymentId) => { console.log("Ready", paymentId); },
-          onReadyForServerCompletion: (paymentId) => { console.log("Complete", paymentId); },
-          onCancel: (paymentId) => { console.log("Cancelled", paymentId); },
-          onError: (error, payment) => { console.error(error); }
-        });
-
-        console.log("Payment object:", payment);
+        const scopes = ['username', 'payments']; 
+        const auth = await Pi.authenticate(scopes, null); // onIncompletePaymentFound = null
+        alert("Welcome " + auth.user.username + " to Yasa Tasker!");
+        console.log("Auth result:", auth);
       } catch (err) {
-        console.error("Payment failed:", err);
+        console.error("Login failed:", err);
+        alert("Login failed: " + err);
       }
     });
-</script>
 
+    // PAY BUTTON
+    const payButton = document.getElementById("payButton");
+    payButton.addEventListener("click", async () => {
+      try {
+        const paymentData = {
+          amount: 1,
+          memo: "Payment for Yasa Tasker task",
+          metadata: { jobId: "1234" }
+        };
+        const result = await Pi.createPayment(paymentData);
+        alert("Payment successful!");
+        console.log("Payment result:", result);
+      } catch (err) {
+        console.error("Payment failed:", err);
+        alert("Payment failed: " + err);
+      }
+    });
+  </script>
 </body>
 </html>
