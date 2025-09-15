@@ -2,8 +2,10 @@
 <html>
 <head>
   <title>YASA Tasker</title>
-  <!-- Pi SDK must be loaded first -->
-  <script src="https://cdn.piplay.org/pi-sdk.js"></script>
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+<script>
+  Pi.init({ version: "2.0", sandbox: true });
+</script>
 </head>
 <body>
   <button id="loginWithPi">Login with Pi</button>
