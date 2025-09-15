@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yasa Tasker</title>
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+  <!-- Pi SDK with onload to initialize -->
+  <script src="https://sdk.minepi.com/pi-sdk.js" onload="initPi()"></script>
 
   <style>
     body {
@@ -50,20 +52,25 @@
       font-size: 1rem;
     }
 
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
     button {
       padding: 12px 25px;
       font-size: 1rem;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      margin-top: 20px;
       transition: transform 0.2s, background 0.2s;
     }
 
     #loginButton {
       background-color: #ffd700;
       color: #000;
-      margin-right: 10px;
     }
 
     #loginButton:hover {
@@ -79,12 +86,6 @@
     #payButton:hover {
       transform: scale(1.05);
       background-color: #45a049;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
     }
   </style>
 </head>
@@ -112,12 +113,14 @@
   <script>
     let loggedInUser = null;
 
-    // Wait for Pi SDK to be ready
-    Pi.ready().then(() => {
-      console.log("Pi SDK ready");
+    // Called automatically when Pi SDK loads
+    function initPi() {
+      console.log("Pi SDK loaded and initializing...");
       Pi.init();
 
       const loginButton = document.getElementById("loginButton");
+      const payButton = document.getElementById("payButton");
+
       loginButton.addEventListener("click", async () => {
         try {
           const scopes = ['username', 'payments'];
@@ -131,7 +134,6 @@
         }
       });
 
-      const payButton = document.getElementById("payButton");
       payButton.addEventListener("click", async () => {
         if (!loggedInUser) {
           alert("Please log in first!");
@@ -147,7 +149,6 @@
           return;
         }
 
-        // Calculate total including 5% fee
         const fee = amount * 0.05;
         const total = amount + fee;
 
@@ -167,19 +168,13 @@
           alert(`Payment of ${total} Pi successful!`);
           console.log("Payment result:", result);
 
-          // Optional: clear form after payment
           document.getElementById("jobForm").reset();
-
         } catch (err) {
           console.error("Payment failed:", err);
           alert("Payment failed: " + err);
         }
       });
-
-    }).catch(err => {
-      console.error("Pi SDK failed to load:", err);
-      alert("Failed to load Pi SDK: " + err);
-    });
+    }
   </script>
 </body>
 </html>
