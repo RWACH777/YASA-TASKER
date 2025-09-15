@@ -29,6 +29,11 @@
       text-shadow: 1px 1px 2px #0003;
     }
 
+    p {
+      color: #fff;
+      margin-bottom: 30px;
+    }
+
     button {
       padding: 15px 30px;
       font-size: 1.1rem;
@@ -80,19 +85,17 @@
 
   <!-- Script Handlers -->
   <script>
-    console.log("JS loaded, Pi SDK should be available:", Pi);
+    console.log("JS loaded");
 
-    // Make sure Pi object exists
-    if (!Pi) {
-      alert("Pi SDK not loaded! Check your internet connection and the SDK URL.");
-    }
+    // 1. Initialize Pi SDK
+    Pi.init();
 
     // LOGIN BUTTON
     const loginButton = document.getElementById("loginButton");
     loginButton.addEventListener("click", async () => {
       try {
         const scopes = ['username', 'payments']; 
-        const auth = await Pi.authenticate(scopes, null); // onIncompletePaymentFound = null
+        const auth = await Pi.authenticate(scopes, null); // null = no incomplete payment callback
         alert("Welcome " + auth.user.username + " to Yasa Tasker!");
         console.log("Auth result:", auth);
       } catch (err) {
