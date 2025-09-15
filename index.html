@@ -1,180 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yasa Tasker</title>
-
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script>
-  Pi.init({ version: "2.0", sandbox: false });
-</script>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #0a1f44;
-      margin: 0;
-      padding: 0;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    h1 {
-      margin-top: 30px;
-      margin-bottom: 10px;
-      font-size: 2.5rem;
-      text-align: center;
-    }
-
-    .container {
-      width: 90%;
-      max-width: 600px;
-      background-color: #13294b;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-      margin-bottom: 30px;
-    }
-
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    button {
-      padding: 12px 25px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-    }
-
-    #loginButton {
-      background-color: #ffd700;
-      color: #000;
-    }
-
-    #loginButton:hover {
-      transform: scale(1.05);
-      background-color: #ffc300;
-    }
-
-    #payButton {
-      background-color: #4caf50;
-      color: #fff;
-    }
-
-    #payButton:hover {
-      transform: scale(1.05);
-      background-color: #45a049;
-    }
-  </style>
+  <title>YASA Tasker</title>
+  <!-- Pi SDK must be loaded first -->
+  <script src="https://cdn.piplay.org/pi-sdk.js"></script>
 </head>
 <body>
-  <h1>Yasa Tasker</h1>
-
-  <div class="container">
-    <form id="jobForm">
-      <label for="jobTitle">Job Title:</label>
-      <input type="text" id="jobTitle" placeholder="Enter job title" required>
-
-      <label for="jobDescription">Job Description:</label>
-      <textarea id="jobDescription" placeholder="Enter job description" rows="4" required></textarea>
-
-      <label for="jobAmount">Amount (Pi):</label>
-      <input type="number" id="jobAmount" placeholder="Enter amount in Pi" min="0.01" step="0.01" required>
-    </form>
-  </div>
-
-  <div class="buttons">
-    <button id="loginButton">Log in with Pi</button>
-    <button id="payButton">Pay with Pi</button>
-  </div>
+  <button id="loginWithPi">Login with Pi</button>
 
   <script>
-    let loggedInUser = null;
+    const loginButton = document.getElementById("loginWithPi");
 
-    function initPi() {
-      console.log("Pi SDK loaded, initializing...");
-      const loginButton = document.getElementById("loginButton");
-      const payButton = document.getElementById("payButton");
-
-      // Login Handler
-      loginButton.addEventListener("click", async () => {
-        try {
-          const scopes = ['username', 'payments'];
-          const auth = await Pi.authenticate(scopes, null);
-          loggedInUser = auth.user;
-          alert(`Welcome ${loggedInUser.username} to Yasa Tasker!`);
-          console.log("Auth result:", auth);
-        } catch (err) {
-          console.error("Login failed:", err);
-          alert("Login failed: " + err);
-        }
-      });
-
-      // Pay Handler
-      payButton.addEventListener("click", async () => {
-        if (!loggedInUser) {
-          alert("Please log in first!");
-          return;
-        }
-
-        const title = document.getElementById("jobTitle").value.trim();
-        const description = document.getElementById("jobDescription").value.trim();
-        const amount = parseFloat(document.getElementById("jobAmount").value);
-
-        if (!title || !description || isNaN(amount) || amount <= 0) {
-          alert("Please fill in all fields with valid values.");
-          return;
-        }
-
-        const fee = amount * 0.05;
-        const total = amount + fee;
-
-        try {
-          const paymentData = {
-            amount: total,
-            memo: `Payment for job: "${title}"`,
-            metadata: {
-              jobTitle: title,
-              jobDescription: description,
-              user: loggedInUser.username,
-              fee: fee
-            }
-          };
-
-          const result = await Pi.createPayment(paymentData);
-          alert(`Payment of ${total} Pi successful!`);
-          console.log("Payment result:", result);
-
-          document.getElementById("jobForm").reset();
-        } catch (err) {
-          console.error("Payment failed:", err);
-          alert("Payment failed: " + err);
-        }
-      });
-    }
+    loginButton.addEventListener("click", async () => {
+      try {
+        const user = await window.Pi.login(); // Pi SDK login
+        console.log("Logged in user:", user);
+      } catch (err) {
+        console.error("Login failed:", err);
+      }
+    });
   </script>
 </body>
 </html>
