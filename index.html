@@ -58,5 +58,29 @@ document.getElementById("payButton").addEventListener("click", async () => {
       console.log("Incomplete payment:", payment);
     }
   </script>
+<script>
+  // Debug helper — shows alerts so you can see what's running on Android Pi Browser
+  alert("Debug: script loaded");
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const lb = document.getElementById("loginButton");
+    if (!lb) {
+      alert("Debug: loginButton NOT found");
+      return;
+    }
+    alert("Debug: loginButton FOUND");
+
+    lb.addEventListener("click", function () {
+      alert("Debug: login clicked");
+      if (typeof Pi === "undefined") {
+        alert("Debug: Pi is UNDEFINED (SDK not loaded or origin not allowed)");
+        return;
+      }
+      alert("Debug: Pi is DEFINED (SDK loaded)");
+      // don't call authenticate yet — just confirm SDK exists first
+    });
+  });
+</script>
+
 </body>
 </html>
