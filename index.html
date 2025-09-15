@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yasa Tasker</title>
 
-  <!-- Pi SDK with onload -->
+  <!-- Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js" onload="initPi()"></script>
 
   <style>
@@ -116,15 +116,16 @@
     function initPi() {
       console.log("Pi SDK loaded, initializing...");
 
-      // Proper initialization for live network
       Pi.init({
         version: "2.0",
-        sandbox: false
+        sandbox: false,  // mainnet
+        apiKey: "jetcqkbectdqvzcldsq3wrxejmbyqf8tsudcqplorskcctgb9glezju7uvwtiyvz"
       });
 
       const loginButton = document.getElementById("loginButton");
       const payButton = document.getElementById("payButton");
 
+      // Login Handler
       loginButton.addEventListener("click", async () => {
         try {
           const scopes = ['username', 'payments'];
@@ -138,6 +139,7 @@
         }
       });
 
+      // Pay Handler
       payButton.addEventListener("click", async () => {
         if (!loggedInUser) {
           alert("Please log in first!");
