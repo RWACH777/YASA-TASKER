@@ -2,12 +2,16 @@
 <html>
 <head>
   <title>YASA Tasker</title>
-  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-<script>
-  Pi.init({ version: "2.0", sandbox: true });
-</script>
 </head>
 <body>
+  <!-- login button -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <script>
+    Pi.init({ version: "2.0", sandbox: true });
+  </script>
+
+<!-- login script -->
+
   <button id="loginWithPi">Login with Pi</button>
 
   <script>
@@ -22,5 +26,19 @@
       }
     });
   </script>
+type PaymentData = {
+  amount: number,
+  memo: string,
+  metadata: Object,
+};
+
+type PaymentCallbacks = {
+  onReadyForServerApproval: (paymentId: string) => void,
+  onReadyForServerCompletion: (paymentId: string, txid: string) => void,
+  onCancel: (paymentId: string) => void,
+  onError: (error: Error, payment?: PaymentDTO) => void,
+};
+
+Pi.createPayment(paymentData: PaymentData, callbacks: PaymentCallbacks): void;
 </body>
 </html>
