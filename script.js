@@ -1,49 +1,26 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('job-form');
-  const list = document.getElementById('job-list');
+// Get the login button from index.html
+const loginButton = document.getElementById("loginButton");
 
-  async function fetchJobs() {
-    try {
-      const res = await fetch('/api/jobs');
-      return await res.json();
-    } catch (e) {
-      console.error('Failed to fetch jobs', e);
-      return [];
-    }
+// Handle login button click
+loginButton.addEventListener("click", async function () {
+  try {
+    // Define which info you want from the user
+    const scopes = ['username']; // add 'payments' if you also want to handle Pi payments
+
+    // Call Pi.authenticate to log in
+    const authResult = await Pi.authenticate(scopes, onIncompletePaymentFound);
+
+    // Log user info
+    console.log("Authenticated user:", authResult);
+    alert("Welcome " + authResult.user.username + "! You are logged in.");
+
+  } catch (err) {
+    console.error("Login failed:", err);
+    alert("Login failed. Check console for details.");
   }
-
-  async function render() {
-    list.innerHTML = '';
-    const jobs = await fetchJobs();
-    if (!jobs || jobs.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = 'No jobs yet. Add one using the form.';
-      list.appendChild(li);
-      return;
-    }
-    jobs.forEach((j) => {
-      const li = document.createElement('li');
-      li.innerHTML = `<strong>${j.title}</strong> — <em>${j.budget} Pi</em><br>${j.desc}`;
-      list.appendChild(li);
-    });
-  }
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const title = document.getElementById('job-title').value.trim();
-    const budget = document.getElementById('job-budget').value.trim();
-    const desc = document.getElementById('job-desc').value.trim();
-    if (!title || !budget || !desc) return alert('Fill all fields');
-
-    await fetch('/api/jobs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, budget, desc })
-    });
-
-    form.reset();
-    await render();
-  });
-
-  render();
 });
+
+// Called when Pi finds an incomplete payment (optional for now)
+function onIncompletePaymentFound(payment) {
+  console.log("Incomplete payment found:", payment);
+}

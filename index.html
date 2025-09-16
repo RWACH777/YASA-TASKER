@@ -1,44 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>YASA Tasker</title>
-</head>
-<body>
-  <!-- login button -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YASA TASKER</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Pi SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
   <script>
-    Pi.init({ version: "2.0", sandbox: true });
+    // Initialize Pi SDK (production mode)
+    Pi.init({ version: "2.0", sandbox: false });
   </script>
+</head>
+<body>
+  <h1>Welcome to YASA TASKER</h1>
 
-<!-- login script -->
+  <!-- Login button -->
+  <button id="loginButton">Login with Pi</button>
 
-  <button id="loginWithPi">Login with Pi</button>
-
-  <script>
-    const loginButton = document.getElementById("loginWithPi");
-
-    loginButton.addEventListener("click", async () => {
-      try {
-        const user = await window.Pi.login(); // Pi SDK login
-        console.log("Logged in user:", user);
-      } catch (err) {
-        console.error("Login failed:", err);
-      }
-    });
-  </script>
-type PaymentData = {
-  amount: number,
-  memo: string,
-  metadata: Object,
-};
-
-type PaymentCallbacks = {
-  onReadyForServerApproval: (paymentId: string) => void,
-  onReadyForServerCompletion: (paymentId: string, txid: string) => void,
-  onCancel: (paymentId: string) => void,
-  onError: (error: Error, payment?: PaymentDTO) => void,
-};
-
-Pi.createPayment(paymentData: PaymentData, callbacks: PaymentCallbacks): void;
+  <script src="script.js"></script>
 </body>
 </html>
